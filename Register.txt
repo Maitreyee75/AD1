@@ -1,0 +1,257 @@
+IN MANIFEST AFTER ACTIVITY
+<activity
+android:name=".ShowActivity"/>
+</application>
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:gravity="center"
+android:padding="20dp"
+android:orientation="vertical">
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Enter Your Name"
+android:textSize="18sp"
+android:textColor="@color/black"
+android:layout_marginBottom="8dp"/>
+<EditText
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:id="@+id/name"
+android:inputType="text"
+android:hint="Enter Your Name"
+android:textSize="18sp"
+android:textColor="@color/black"
+android:padding="10dp"
+android:layout_marginBottom="16dp"/>
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Select Your Subject"
+android:textSize="18sp"
+android:textColor="@color/black"
+android:layout_marginBottom="8dp"/>
+<Spinner
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:id="@+id/subject"
+android:layout_marginBottom="16dp"/>
+
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Select Your Gender"
+android:textSize="18sp"
+android:textColor="@color/black"
+android:layout_marginBottom="8dp"/>
+<RadioGroup
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:id="@+id/gender"
+android:layout_marginBottom="16dp"
+android:orientation="horizontal"
+android:gravity="center">
+<RadioButton
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:id="@+id/male"
+android:text="Male"
+/>
+<RadioButton
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:id="@+id/female"
+android:text="Female"
+/>
+<RadioButton
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:id="@+id/other"
+android:text="Other"
+/>
+</RadioGroup>
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical">
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Select Your Qualification"
+android:textSize="18sp"
+android:textColor="@color/black"
+android:layout_gravity="center"
+
+android:layout_marginBottom="8dp"/>
+<CheckBox
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Diploma"
+android:id="@+id/diploma"/>
+<CheckBox
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Graduate"
+android:id="@+id/grad"/>
+<CheckBox
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Post Graduate"
+android:id="@+id/pg"/>
+</LinearLayout>
+<Button
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:id="@+id/submit"
+android:text="Submit"
+/>
+
+</LinearLayout>
+
+activity_show.xml
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center"
+android:padding="20dp">
+<TextView android:id="@+id/showDataTextView"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textSize="18sp"
+/>
+<Button
+android:id="@+id/btnLogout"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Logout"
+android:textSize="18sp"
+
+android:padding="10dp"
+android:textColor="@color/white"
+android:layout_marginTop="20dp"
+android:onClick="onClick" />
+</LinearLayout>
+
+MainActivity.java
+package com.example.ad4m;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+EditText name;
+Spinner subject;
+RadioGroup gender;
+CheckBox diploma,grad,pg;
+Button submit;
+
+@SuppressLint("MissingInflatedId")
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+EdgeToEdge.enable(this);
+setContentView(R.layout.activity_main);
+name = findViewById(R.id.name);
+subject = findViewById(R.id.subject);
+gender = findViewById(R.id.gender);
+diploma = findViewById(R.id.diploma);
+grad = findViewById(R.id.grad);
+pg = findViewById(R.id.pg);
+submit = findViewById(R.id.submit);
+ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+android.R.layout.simple_spinner_item,
+
+new String[]{"java", "dbm", "c++", "python"});
+adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+subject.setAdapter(adapter);
+submit.setOnClickListener(new View.OnClickListener() {
+@Override
+public void onClick(View v) {
+String nm = name.getText().toString().trim();
+if(nm.isEmpty() || !nm.matches("[a-zA-z]+")){
+name.setError("Please enter a valid name ");
+return;
+}
+String sub = subject.getSelectedItem().toString();
+int genderid = gender.getCheckedRadioButtonId();
+String g = genderid != -1 ? ((RadioButton)
+findViewById(genderid)).getText().toString() : "not selected";
+StringBuilder qual = new StringBuilder();
+if(grad.isChecked()) {
+qual.append("Graduate");
+qual.append("\t");
+}
+if(diploma.isChecked()) {
+qual.append("Diploma");
+qual.append("\t");
+}
+if(pg.isChecked()) {
+qual.append("Post Graduate");
+}
+Intent intent = new Intent(MainActivity.this,
+ShowActivity.class);
+intent.putExtra("name", nm);
+intent.putExtra("subject", sub);
+intent.putExtra("gender", g);
+intent.putExtra("qual", qual.toString());
+startActivity(intent);
+}
+});
+}
+}
+
+ShowActivity.java
+
+package com.example.ad4m;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import androidx.activity.EdgeToEdge;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+public class ShowActivity extends AppCompatActivity {
+@SuppressLint("SetTextI18n")
+@Override
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+EdgeToEdge.enable(this);
+setContentView(R.layout.activity_show);
+@SuppressLint({"MissingInflatedId", "LocalSuppress"}) TextView
+data = findViewById(R.id.showDataTextView);
+String name = getIntent().getStringExtra("name");
+String subject = getIntent().getStringExtra("subject");
+String gender = getIntent().getStringExtra("gender");
+String qual = getIntent().getStringExtra("qual");
+
+data.setText("Name :" + name + "\n"+
+"Subject: " + subject + "\n" +
+"Gender: " + gender + "\n" +
+"Qualifications: " + qual);
+}
+public void onClick(View v){
+Intent intent = new Intent(ShowActivity.this,
+MainActivity.class);
+intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+Intent.FLAG_ACTIVITY_CLEAR_TASK);
+startActivity(intent);
+finish();
+}
+}
+
+

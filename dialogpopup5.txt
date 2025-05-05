@@ -1,0 +1,184 @@
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".MainActivity">
+<!-- Toolbar -->
+<androidx.appcompat.widget.Toolbar
+android:id="@+id/toolbar"
+android:layout_width="0dp"
+android:layout_height="?attr/actionBarSize"
+android:background="@android:color/system_error_400"
+android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+app:layout_constraintTop_toTopOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent"/>
+<!-- ListView -->
+<ListView android:id="@+id/list_view"
+android:layout_width="0dp"
+android:layout_height="0dp"
+app:layout_constraintTop_toBottomOf="@id/toolbar"
+app:layout_constraintBottom_toBottomOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+item_dialog.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+android:padding="16dp">
+<EditText android:id="@+id/etItem"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="Enter item"
+android:inputType="text"/>
+</LinearLayout>
+
+MainActivity.java
+package com.example.ad5m;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity {
+EditText etItem;
+ArrayList<String> list = new ArrayList<>();
+ListView listView;
+ArrayAdapter<String> arrayAdapter;
+@SuppressLint("MissingInflatedId")
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+EdgeToEdge.enable(this);
+setContentView(R.layout.activity_main);
+// Set Toolbar as ActionBar
+@SuppressLint({"MissingInflatedId", "LocalSuppress"}) Toolbar toolbar =
+findViewById(R.id.toolbar);
+setSupportActionBar(toolbar);
+listView = findViewById(R.id.list_view);
+arrayAdapter = new ArrayAdapter<>(this,
+android.R.layout.simple_list_item_1, list);
+listView.setAdapter(arrayAdapter);
+listView.setOnItemClickListener((parent, view, position, id) -> {
+PopupMenu popupMenu = new PopupMenu(MainActivity.this, view);
+popupMenu.getMenuInflater().inflate(R.menu.pop_up_menu,
+popupMenu.getMenu());
+popupMenu.setOnMenuItemClickListener(item -> {
+int itemId = item.getItemId();
+if (itemId == R.id.item_update) {
+
+showUpdateDialog(position);
+} else if (itemId == R.id.item_del) {
+list.remove(position);
+arrayAdapter.notifyDataSetChanged();
+Toast.makeText(MainActivity.this, "Item Deleted",
+Toast.LENGTH_SHORT).show();
+}
+return true;
+});
+popupMenu.show();
+});
+}
+private void showUpdateDialog(final int position) {
+AlertDialog.Builder builder = new AlertDialog.Builder(this);
+View v = LayoutInflater.from(this).inflate(R.layout.item_dialog, null,
+false);
+builder.setTitle("Update Item");
+final EditText editText = v.findViewById(R.id.etItem);
+editText.setText(list.get(position));
+builder.setView(v);
+builder.setPositiveButton("Update", (dialog, which) -> {
+String newItem = editText.getText().toString().trim();
+if (!newItem.isEmpty()) {
+list.set(position, newItem);
+arrayAdapter.notifyDataSetChanged();
+Toast.makeText(MainActivity.this, "Item Updated!",
+Toast.LENGTH_SHORT).show();
+} else {
+editText.setError("Add item here!");
+}
+});
+builder.setNegativeButton("Cancel", (dialog, which) ->
+dialog.dismiss());
+builder.show();
+}
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+getMenuInflater().inflate(R.menu.main_menu, menu);
+return true;
+}
+@Override
+public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+if (item.getItemId() == R.id.add_item) {
+showAddItemDialog();
+return true;
+
+}
+return super.onOptionsItemSelected(item);
+}
+private void showAddItemDialog() {
+AlertDialog.Builder builder = new AlertDialog.Builder(this);
+builder.setTitle("Add New Item");
+View v = LayoutInflater.from(this).inflate(R.layout.item_dialog, null,
+false);
+builder.setView(v);
+@SuppressLint({"MissingInflatedId", "LocalSuppress"}) final EditText
+etItem = v.findViewById(R.id.etItem);
+builder.setPositiveButton("Add", (dialog, which) -> {
+String newItem = etItem.getText().toString().trim();
+if (!newItem.isEmpty()) {
+list.add(newItem);
+arrayAdapter.notifyDataSetChanged();
+} else {
+etItem.setError("Add item here!");
+}
+});
+
+builder.setNegativeButton("Cancel", (dialog, which) ->
+dialog.dismiss());
+builder.show();
+}
+}
+
+Res -> menu -> main_menu.xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+<item android:id="@+id/add_item"
+android:title="Add New"
+android:icon="@android:drawable/ic_input_add"
+app:showAsAction="always"/>
+</menu>
+
+Res -> menu -> pop_uu_menu.xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/item_update"
+android:title="Update"/>
+<item android:id="@+id/item_del"
+android:title="Delete"/>
+
+</menu>
+
+

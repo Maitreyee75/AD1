@@ -1,0 +1,115 @@
+3 images
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center"
+android:padding="16dp"
+android:background="@android:color/white">
+<!-- App Name at the Top -->
+<TextView
+android:id="@+id/appTitle"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Auto Slider"
+android:textSize="24sp"
+android:textStyle="bold"
+android:padding="10dp"
+android:textColor="@android:color/white"
+android:background="@android:color/holo_purple"
+android:layout_marginBottom="16dp"/>
+<!-- ViewPager2 for Image Slider -->
+<androidx.viewpager2.widget.ViewPager2
+android:id="@+id/viewPager"
+android:layout_width="300dp"
+android:layout_height="180dp"
+android:layout_marginBottom="10dp"/>
+
+</LinearLayout>
+
+item_image.xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<ImageView
+android:id="@+id/imageView"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:scaleType="centerCrop"
+android:contentDescription="slider image" />
+
+</FrameLayout>
+
+MainActivity.java
+package com.example.ad7m;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
+import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity {
+ViewPager2 viewPager;
+ImageSliderAdapter adapter;
+ArrayList<Integer> imageList;
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.activity_main);
+viewPager = findViewById(R.id.viewPager);
+imageList = new ArrayList<>();
+imageList.add(R.drawable.img1);
+imageList.add(R.drawable.img2);
+imageList.add(R.drawable.img3);
+adapter = new ImageSliderAdapter(imageList);
+viewPager.setAdapter(adapter);
+}
+}
+
+​
+ImageSliderAdapter.java
+package com.example.ad7m;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+public class ImageSliderAdapter extends
+RecyclerView.Adapter<ImageSliderAdapter.ViewHolder> {
+ArrayList<Integer> images;
+
+public ImageSliderAdapter(ArrayList<Integer> images) {
+this.images = images;
+}
+@NonNull
+@Override
+public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int
+viewType) {
+View v =
+LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent,
+false);
+return new ViewHolder(v);
+}
+@Override
+public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+holder.imageView.setImageResource(images.get(position));
+}
+@Override
+public int getItemCount() {
+return images.size();
+}
+public static class ViewHolder extends RecyclerView.ViewHolder {
+ImageView imageView;
+public ViewHolder(@NonNull View itemView) {
+super(itemView);
+imageView = itemView.findViewById(R.id.imageView);
+}
+}
+}
+
+
